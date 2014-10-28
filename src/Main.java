@@ -9,6 +9,8 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.List;
+import com.itextpdf.text.ListItem;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
@@ -25,9 +27,9 @@ public class Main {
 	static Document document = new Document(PageSize.A4.rotate());
 	private static String text = "\tLorem Ipsum is simply dummy text of the printing and typesetting\t industry.\nLorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
 	
-	static Font font9 = new Font(Font.FontFamily.HELVETICA, 		9);
+	static Font font8 = new Font(Font.FontFamily.HELVETICA, 		8);
 	static Font font9italic = new Font(Font.FontFamily.HELVETICA, 		9, Font.ITALIC);
-	static Font font9boldUnder = new Font(Font.FontFamily.HELVETICA, 		9, Font.BOLD | Font.UNDERLINE);
+	static Font font8boldUnder = new Font(Font.FontFamily.HELVETICA, 		8, Font.BOLD | Font.UNDERLINE);
 	static Font font9bold = new Font(Font.FontFamily.HELVETICA, 		9);
 	
 	static Font font25 = new Font(Font.FontFamily.HELVETICA, 		25);
@@ -175,7 +177,7 @@ public class Main {
 
 	        for (int i = 0; i < 20; i++) {
 				addDirParagraph(f1);
-				addAssessmentList(font9boldUnder);
+				addAssessmentList(font8boldUnder);
 			}
 			
 
@@ -205,7 +207,7 @@ public class Main {
 	}
 	public static void addDirParagraph(Font f1) throws DocumentException {
         PdfPTable table = new PdfPTable(2); // 3 columns.
-        table.setSpacingAfter(8f);
+        table.setSpacingAfter(5);
         PdfPCell parNumCell = new PdfPCell(new Paragraph("121", f1));
         parNumCell.setBorderWidthBottom(0f);
         parNumCell.setBorderWidthLeft(0f);
@@ -232,42 +234,59 @@ public class Main {
 		
 	}
 	public static void addAssessmentList(Font f1) throws DocumentException {
-		PdfPTable table = new PdfPTable(7);
+		PdfPTable table = new PdfPTable(8);
+		table.getDefaultCell().setPaddingBottom(3);
+		table.getDefaultCell().setBorder(Rectangle.NO_BORDER); 
+		float[] columnWidths = {20f, 12f, 15f, 28f, 30f, 16f, 45f,45f};
+
+		table.setWidths(columnWidths);
+		
 		//table.getDefaultCell().setBorder(Rectangle.BOTTOM);
-		PdfPCell column01 = new PdfPCell(new Paragraph("Bank", f1));
-		PdfPCell column02 = new PdfPCell(new Paragraph("WS", f1));
-		PdfPCell column03 = new PdfPCell(new Paragraph("1-Gap", f1));
-		PdfPCell column04 = new PdfPCell(new Paragraph("2-Peoject Status", f1));
-		PdfPCell column05 = new PdfPCell(new Paragraph("3-Compliance", f1));
-		PdfPCell column06 = new PdfPCell(new Paragraph("Target Date", f1));
-		PdfPCell column07 = new PdfPCell(new Paragraph("Measure of Success", f1));
+
+		table.addCell(new Phrase("Bank", f1));
+		table.addCell(new Paragraph("WS", f1));
+		table.addCell(new Paragraph("1-Gap", f1));
+		table.addCell(new Paragraph("2-Project Status", f1));
+		table.addCell(new Paragraph("3-Compliance", f1));
+		table.addCell(new Paragraph("Target Date", f1));
+		table.addCell(new Paragraph("Measure of Success", f1));
+		table.addCell(new Paragraph("Comments", f1));
 		
-		column01.setBorder(Rectangle.NO_BORDER);
-		column02.setBorder(Rectangle.NO_BORDER);
-		column03.setBorder(Rectangle.NO_BORDER);
-		column04.setBorder(Rectangle.NO_BORDER);
-		column05.setBorder(Rectangle.NO_BORDER);
-		column06.setBorder(Rectangle.NO_BORDER);
-		column07.setBorder(Rectangle.NO_BORDER);
+		table.addCell(new Phrase("Bank China America",font8));
+		table.addCell(new Paragraph("WS",font8));
+		table.addCell(new Paragraph("Major",font8));
+		table.addCell(new Paragraph("2-Peoject Status",font8));
+		table.addCell(new Paragraph("3-Compliance",font8));
+		table.addCell(new Paragraph("2014-23-12",font8));
 		
-		column01.setPaddingBottom(5);
-		column02.setPaddingBottom(5);
-		column03.setPaddingBottom(5);
-		column04.setPaddingBottom(5);
-		column05.setPaddingBottom(5);
-		column06.setPaddingBottom(5);
-		column07.setPaddingBottom(5);
+		List unorderedList = new List(List.UNORDERED);
+        unorderedList.add(new ListItem("Item 1 Comment rinting and typesetting Lorem Ipsum is simply",font8));
+        unorderedList.add(new ListItem("Item 2 smg and typesetting Lorem Ipsum is simply",font8));
+        unorderedList.add(new ListItem("Item 3 Comment  Comment rinting and typesetting Lorem Ipsum is simplypesetting",font8));
+        
+        Phrase phrase = new Phrase();
+        phrase.add(unorderedList);
+        
+        // We add this phrase to a cell
+        PdfPCell phraseCell = new PdfPCell();
+        phraseCell.setBorder(Rectangle.NO_BORDER);
+        phraseCell.addElement(phrase);
+        phraseCell.setPaddingTop(-3);
+        
+		table.addCell(phraseCell );
+		table.addCell(new Paragraph("Comment rinting and typesetting Lorem Ipsum is simply dummy text ting and typesetting",font8));
 		
+		table.addCell(new Phrase("New West China America",font8));
+		table.addCell(new Paragraph("PMO",font8));
+		table.addCell(new Paragraph("Major",font8));
+		table.addCell(new Paragraph("Completed",font8));
+		table.addCell(new Paragraph("Substantial Compliance",font8));
+		table.addCell(new Paragraph("2014-23-12",font8));
+		table.addCell(new Paragraph("Lorem Ipsums simply dummy text of the printing and typesetting",font8));
+		table.addCell(new Paragraph("Commit ting and typesetting",font8));
 		
-		table.addCell(column01);
-		table.addCell(column02);
-		table.addCell(column03);
-		table.addCell(column04);
-		table.addCell(column05);
-		table.addCell(column06);
-		table.addCell(column07);
 		table.setWidthPercentage(100);
-		table.setSpacingAfter(10);
+		table.setSpacingAfter(18);
 		document.add(table);
 		
 	}
