@@ -1,3 +1,4 @@
+package com.blackiceincx.reports;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

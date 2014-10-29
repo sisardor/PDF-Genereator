@@ -4,7 +4,6 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="lib" path="lib/pdfbox-1.8.7/pdfbox-app-1.8.7.jar"/>
 	<classpathentry kind="lib" path="lib/itext-4.2.1/itext-4.2.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com-blackice-gcd-dev"/>
 	<classpathentry exported="true" kind="lib" path="C:/Users/Mac/.m2/repository/org/hibernate/hibernate/3.2.5.ga/hibernate-3.2.5.ga.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

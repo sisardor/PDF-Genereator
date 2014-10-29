@@ -1,3 +1,4 @@
+package com.blackiceincx;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,6 +10,9 @@ import java.util.List;
 import com.blackice.persistence.model.Assessment;
 import com.blackice.persistence.model.Directive;
 import com.blackice.persistence.model.DirectiveParagraph;
+import com.blackiceincx.reports.ParagraphDetailsData;
+import com.blackiceincx.reports.ParagraphDetailsReport;
+import com.blackiceincx.reports.ReportData;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.PageSize;
