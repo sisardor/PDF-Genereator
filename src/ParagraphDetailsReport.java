@@ -45,19 +45,20 @@ public class ParagraphDetailsReport {
 	int pdfWidth;
 	private ParagraphDetailsData reportData;
 	
-	
+	private static String test = "Hello World";
 	
 	public void generateReport(OutputStream os) throws DocumentException, IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PdfWriter docWriter = null;
 		//HeaderFooterX event = new HeaderFooterX();
-		HeaderFooter event = new HeaderFooter();
+		HeaderFooter event = new HeaderFooter(this);
 		
 		docWriter = PdfWriter.getInstance(document, baos);
 		Rectangle mediabox = document.getPageSize();
 	      pdfHeight = (int) mediabox.getHeight();
 	      pdfWidth = (int) mediabox.getWidth();
-		docWriter.setBoxSize("art", new Rectangle(36, 54, pdfWidth,pdfHeight));
+		docWriter.setBoxSize("header", new Rectangle(36, pdfHeight, pdfWidth,pdfHeight));
+		docWriter.setBoxSize("footer", new Rectangle(36, 54, pdfWidth,pdfHeight));
 		docWriter.setPageEvent(event);
 		//event.setHeader("Basel");
 		document.open();
@@ -68,6 +69,12 @@ public class ParagraphDetailsReport {
 	    	
 			addDirParagraph(font9);
 			addAssessmentList(font8boldUnder);
+			if(i==10) {
+				test="Bank China America";
+			}
+			if(i==15) {
+				test="ACME";
+			}
 	    }
 	    
 	    
@@ -177,6 +184,12 @@ public class ParagraphDetailsReport {
 	public void setReportData(ParagraphDetailsData reportData) {
 		this.reportData = reportData;
 	}
+	public String getTest() {
+		return test;
+	}
+	public void setTest(String test) {
+		this.test ="Hello World";
+	}
 	
 	
 	
@@ -227,7 +240,13 @@ class HeaderFooterX extends PdfPageEventHelper {
 
 /** Inner class to add a header and a footer. */
 class HeaderFooter extends PdfPageEventHelper {
-    /** Alternating phrase for the header. */
+	ParagraphDetailsReport report;
+    public HeaderFooter(ParagraphDetailsReport report) {
+		super();
+		this.report = report;
+	}
+
+	/** Alternating phrase for the header. */
     Phrase[] header = new Phrase[2];
     /** Current page number (will be reset for every chapter). */
     int pagenumber;
@@ -260,6 +279,7 @@ class HeaderFooter extends PdfPageEventHelper {
      */
     public void onStartPage(PdfWriter writer, Document document) {
         pagenumber++;
+        System.out.println(report.getTest());
     }
 
     /**
@@ -268,10 +288,16 @@ class HeaderFooter extends PdfPageEventHelper {
      *      com.itextpdf.text.pdf.PdfWriter, com.itextpdf.text.Document)
      */
     public void onEndPage(PdfWriter writer, Document document) {
-        Rectangle rect = writer.getBoxSize("art");
-        System.out.println(rect.getHeight());
+        Rectangle header = writer.getBoxSize("header");
+        System.out.println(header.getLeft() +  " " + header.getRight() + " " +header.getBottom());
         ColumnText.showTextAligned(writer.getDirectContent(),
                 Element.ALIGN_CENTER, new Phrase(String.format("page %d", pagenumber), new Font(Font.BOLD,9)),
-                (rect.getLeft() + rect.getRight()) / 2, rect.getBottom() - 35, 0);
+                (header.getLeft() + header.getRight()) / 2, header.getBottom() -30, 0);
+        
+        Rectangle footer = writer.getBoxSize("footer");
+       
+        ColumnText.showTextAligned(writer.getDirectContent(),
+                Element.ALIGN_CENTER, new Phrase(String.format("page %d", pagenumber), new Font(Font.BOLD,9)),
+                (footer.getLeft() + footer.getRight()) / 2, footer.getBottom() -30, 0);
     }
 }
