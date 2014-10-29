@@ -41,20 +41,28 @@ public class ParagraphDetailsReport {
 	static String headerRegulation = "Regulation: %s";
 	static String headerAssDate = "Assessment Date: %s";
 	static String headerAssCriteria = "Assessment Criteria: %s";
-	
+	int pdfHeight;
+	int pdfWidth;
 	private ParagraphDetailsData reportData;
 	
 	
 	
-	public OutputStream generateReport(OutputStream os) throws DocumentException, IOException {
+	public void generateReport(OutputStream os) throws DocumentException, IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PdfWriter docWriter = null;
 		//HeaderFooterX event = new HeaderFooterX();
+		HeaderFooter event = new HeaderFooter();
+		
 		docWriter = PdfWriter.getInstance(document, baos);
-		//docWriter.setPageEvent(event);
+		Rectangle mediabox = document.getPageSize();
+	      pdfHeight = (int) mediabox.getHeight();
+	      pdfWidth = (int) mediabox.getWidth();
+		docWriter.setBoxSize("art", new Rectangle(36, 54, pdfWidth,pdfHeight));
+		docWriter.setPageEvent(event);
 		//event.setHeader("Basel");
 		document.open();
 		
+	      System.out.println("page " +pdfHeight + " x " + pdfWidth);
 		// Add content
 	    for (int i = 0; i < 20; i++) {
 	    	
@@ -62,22 +70,14 @@ public class ParagraphDetailsReport {
 			addAssessmentList(font8boldUnder);
 	    }
 	    
+	    
+	    
+	    
 		document.close();
 		docWriter.close();
-		
-		
-		PdfReader reader = new PdfReader(baos.toByteArray());
-		ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-		PdfStamper stamper = new PdfStamper(reader, baos2);
-		
-		// Add changes ...
-		
-		stamper.close();
-        reader.close();
-        
-        baos2.writeTo(os);
-        
-		return os;
+      
+        baos.writeTo(os);
+        os.flush();
 	}
 	public static void addDirParagraph(Font f1) throws DocumentException {
         PdfPTable table = new PdfPTable(2); // 3 columns.
@@ -190,30 +190,29 @@ class HeaderFooterX extends PdfPageEventHelper {
     }
 	public void onOpenDocument(PdfWriter writer, Document document) {
 		//header[0] = new Phrase("Movie history");
-		System.out.println("Document created");
-		total = writer.getDirectContent().createTemplate(30, 16);
+		Rectangle mediabox = document.getPageSize();
+	    
+		total = writer.getDirectContent().createTemplate(30,16);
+		System.out.println("Document created " + total.getWidth());
 	}
-    public void onStartPage(PdfWriter writer, Document document) {
-        System.out.println("page count " + pagenumber);
-        pagenumber++;
-        
-    }
+    
     public void onEndPage(PdfWriter writer, Document document) {
     	System.out.println("onEndPage");
     	PdfPTable table = new PdfPTable(3);
         try {
             table.setWidths(new int[]{24, 24, 2});
-            table.setTotalWidth(527);
+            table.setTotalWidth(770);
             table.setLockedWidth(true);
             table.getDefaultCell().setFixedHeight(20);
             table.getDefaultCell().setBorder(Rectangle.BOTTOM);
+
             table.addCell(header);
             table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
             table.addCell(String.format("Page %d of", writer.getPageNumber()));
             PdfPCell cell = new PdfPCell(Image.getInstance(total));
             cell.setBorder(Rectangle.BOTTOM);
             table.addCell(cell);
-            table.writeSelectedRows(0, -1, 34, 803, writer.getDirectContent());
+            table.writeSelectedRows(0, -1, 34, 595-10, writer.getDirectContent());
         }
         catch(DocumentException de) {
             throw new ExceptionConverter(de);
@@ -221,8 +220,58 @@ class HeaderFooterX extends PdfPageEventHelper {
     }
     
     public void onCloseDocument(PdfWriter writer, Document document) {
-        ColumnText.showTextAligned(total, Element.ALIGN_LEFT,
-                new Phrase(String.valueOf(writer.getPageNumber() - 1)), 2, 2, 0);
+        ColumnText.showTextAligned(total, Element.ALIGN_LEFT, new Phrase(String.valueOf(writer.getPageNumber() - 1)), 2, 2, 0);
     }
 }
 
+
+/** Inner class to add a header and a footer. */
+class HeaderFooter extends PdfPageEventHelper {
+    /** Alternating phrase for the header. */
+    Phrase[] header = new Phrase[2];
+    /** Current page number (will be reset for every chapter). */
+    int pagenumber;
+
+    /**
+     * Initialize one of the headers.
+     * @see com.itextpdf.text.pdf.PdfPageEventHelper#onOpenDocument(
+     *      com.itextpdf.text.pdf.PdfWriter, com.itextpdf.text.Document)
+     */
+    public void onOpenDocument(PdfWriter writer, Document document) {
+        header[0] = new Phrase("Movie history");
+    }
+
+    /**
+     * Initialize one of the headers, based on the chapter title;
+     * reset the page number.
+     * @see com.itextpdf.text.pdf.PdfPageEventHelper#onChapter(
+     *      com.itextpdf.text.pdf.PdfWriter, com.itextpdf.text.Document, float,
+     *      com.itextpdf.text.Paragraph)
+     */
+
+    public void onChapter(PdfWriter writer, Document document, float paragraphPosition, Paragraph title) {
+        System.out.println("onChapter");
+    }
+
+    /**
+     * Increase the page number.
+     * @see com.itextpdf.text.pdf.PdfPageEventHelper#onStartPage(
+     *      com.itextpdf.text.pdf.PdfWriter, com.itextpdf.text.Document)
+     */
+    public void onStartPage(PdfWriter writer, Document document) {
+        pagenumber++;
+    }
+
+    /**
+     * Adds the header and the footer.
+     * @see com.itextpdf.text.pdf.PdfPageEventHelper#onEndPage(
+     *      com.itextpdf.text.pdf.PdfWriter, com.itextpdf.text.Document)
+     */
+    public void onEndPage(PdfWriter writer, Document document) {
+        Rectangle rect = writer.getBoxSize("art");
+        System.out.println(rect.getHeight());
+        ColumnText.showTextAligned(writer.getDirectContent(),
+                Element.ALIGN_CENTER, new Phrase(String.format("page %d", pagenumber), new Font(Font.BOLD,9)),
+                (rect.getLeft() + rect.getRight()) / 2, rect.getBottom() - 35, 0);
+    }
+}
