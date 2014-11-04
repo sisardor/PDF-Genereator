@@ -2,14 +2,10 @@ package com.blackiceincx;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import com.blackice.persistence.model.Assessment;
-import com.blackice.persistence.model.Directive;
-import com.blackice.persistence.model.DirectiveParagraph;
 import com.blackiceincx.reports.ParagraphDetailsData;
 import com.blackiceincx.reports.ParagraphDetailsReport;
 import com.blackiceincx.reports.ReportData;
