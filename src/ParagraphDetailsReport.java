@@ -4,29 +4,21 @@ import java.io.OutputStream;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
-import com.lowagie.text.Element;
-import com.lowagie.text.ExceptionConverter;
 import com.lowagie.text.Font;
-import com.lowagie.text.Image;
 import com.lowagie.text.List;
 import com.lowagie.text.ListItem;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.ColumnText;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfPageEventHelper;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfStamper;
-import com.lowagie.text.pdf.PdfTemplate;
 import com.lowagie.text.pdf.PdfWriter;
 
 
 
 
 public class ParagraphDetailsReport {
-	private static Document document;
+	private Document document;
 	private static String text = "\tLorem Ipsum is simply dummy text of the printing and typesetting\t industry.\nLorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
 	
 	static Font font8 = new Font(Font.HELVETICA, 		8);
@@ -35,30 +27,29 @@ public class ParagraphDetailsReport {
 	static Font font9bold = new Font(Font.HELVETICA, 		9);
 	static Font font9 = new Font(Font.HELVETICA, 		9);
 	
-	static Font font10 = new Font(Font.TIMES_ROMAN, 	10);
-	static Font font10bold = new Font(Font.TIMES_ROMAN, 	10, Font.BOLD);
-	static String headerLabel = "Bank Assessment Detail";
-	static String headerRegulation = "Regulation: %s";
-	static String headerAssDate = "Assessment Date: %s";
-	static String headerAssCriteria = "Assessment Criteria: %s";
+	
 	int pdfHeight;
 	int pdfWidth;
 	private ParagraphDetailsData reportData;
 	
-	private static String test = "Hello World";
+	private String test = "Hello World";
 	
 	public void generateReport(OutputStream os) throws DocumentException, IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PdfWriter docWriter = null;
-		//HeaderFooterX event = new HeaderFooterX();
-		HeaderFooter event = new HeaderFooter(this);
+		HeaderFooterEvent event = new HeaderFooterEvent();
+		//EventHandler event = new EventHandler(this);
 		
 		docWriter = PdfWriter.getInstance(document, baos);
 		Rectangle mediabox = document.getPageSize();
-	      pdfHeight = (int) mediabox.getHeight();
-	      pdfWidth = (int) mediabox.getWidth();
-		docWriter.setBoxSize("header", new Rectangle(36, pdfHeight, pdfWidth,pdfHeight));
+	    pdfHeight = (int) mediabox.getHeight();
+	    pdfWidth = (int) mediabox.getWidth();
+	    
+	    Rectangle rect = new Rectangle(36, pdfHeight, pdfWidth,pdfHeight);
+	    rect.setBorderWidth(2f);
+		docWriter.setBoxSize("header", rect);
 		docWriter.setBoxSize("footer", new Rectangle(36, 54, pdfWidth,pdfHeight));
+		
 		docWriter.setPageEvent(event);
 		//event.setHeader("Basel");
 		document.open();
@@ -86,7 +77,7 @@ public class ParagraphDetailsReport {
         baos.writeTo(os);
         os.flush();
 	}
-	public static void addDirParagraph(Font f1) throws DocumentException {
+	public  void addDirParagraph(Font f1) throws DocumentException {
         PdfPTable table = new PdfPTable(2); // 3 columns.
         table.setSpacingAfter(3);
         PdfPCell parNumCell = new PdfPCell(new Paragraph("121", f1));
@@ -114,7 +105,7 @@ public class ParagraphDetailsReport {
 		document.add(table);
 		
 	}
-	public static void addAssessmentList(Font f1) throws DocumentException {
+	public  void addAssessmentList(Font f1) throws DocumentException {
 		PdfPTable table = new PdfPTable(8);
 		table.getDefaultCell().setPaddingTop(4);
 		table.getDefaultCell().setBorder(Rectangle.NO_BORDER); 
@@ -194,110 +185,5 @@ public class ParagraphDetailsReport {
 	
 	
 }
-class HeaderFooterX extends PdfPageEventHelper {
-	int pagenumber;
-	String header;
-	PdfTemplate total;
-	public void setHeader(String header) {
-        this.header = header;
-    }
-	public void onOpenDocument(PdfWriter writer, Document document) {
-		//header[0] = new Phrase("Movie history");
-		Rectangle mediabox = document.getPageSize();
-	    
-		total = writer.getDirectContent().createTemplate(30,16);
-		System.out.println("Document created " + total.getWidth());
-	}
-    
-    public void onEndPage(PdfWriter writer, Document document) {
-    	System.out.println("onEndPage");
-    	PdfPTable table = new PdfPTable(3);
-        try {
-            table.setWidths(new int[]{24, 24, 2});
-            table.setTotalWidth(770);
-            table.setLockedWidth(true);
-            table.getDefaultCell().setFixedHeight(20);
-            table.getDefaultCell().setBorder(Rectangle.BOTTOM);
-
-            table.addCell(header);
-            table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
-            table.addCell(String.format("Page %d of", writer.getPageNumber()));
-            PdfPCell cell = new PdfPCell(Image.getInstance(total));
-            cell.setBorder(Rectangle.BOTTOM);
-            table.addCell(cell);
-            table.writeSelectedRows(0, -1, 34, 595-10, writer.getDirectContent());
-        }
-        catch(DocumentException de) {
-            throw new ExceptionConverter(de);
-        }
-    }
-    
-    public void onCloseDocument(PdfWriter writer, Document document) {
-        ColumnText.showTextAligned(total, Element.ALIGN_LEFT, new Phrase(String.valueOf(writer.getPageNumber() - 1)), 2, 2, 0);
-    }
-}
 
 
-/** Inner class to add a header and a footer. */
-class HeaderFooter extends PdfPageEventHelper {
-	ParagraphDetailsReport report;
-    public HeaderFooter(ParagraphDetailsReport report) {
-		super();
-		this.report = report;
-	}
-
-	/** Alternating phrase for the header. */
-    Phrase[] header = new Phrase[2];
-    /** Current page number (will be reset for every chapter). */
-    int pagenumber;
-
-    /**
-     * Initialize one of the headers.
-     * @see com.itextpdf.text.pdf.PdfPageEventHelper#onOpenDocument(
-     *      com.itextpdf.text.pdf.PdfWriter, com.itextpdf.text.Document)
-     */
-    public void onOpenDocument(PdfWriter writer, Document document) {
-        header[0] = new Phrase("Movie history");
-    }
-
-    /**
-     * Initialize one of the headers, based on the chapter title;
-     * reset the page number.
-     * @see com.itextpdf.text.pdf.PdfPageEventHelper#onChapter(
-     *      com.itextpdf.text.pdf.PdfWriter, com.itextpdf.text.Document, float,
-     *      com.itextpdf.text.Paragraph)
-     */
-
-    public void onChapter(PdfWriter writer, Document document, float paragraphPosition, Paragraph title) {
-        System.out.println("onChapter");
-    }
-
-    /**
-     * Increase the page number.
-     * @see com.itextpdf.text.pdf.PdfPageEventHelper#onStartPage(
-     *      com.itextpdf.text.pdf.PdfWriter, com.itextpdf.text.Document)
-     */
-    public void onStartPage(PdfWriter writer, Document document) {
-        pagenumber++;
-        System.out.println(report.getTest());
-    }
-
-    /**
-     * Adds the header and the footer.
-     * @see com.itextpdf.text.pdf.PdfPageEventHelper#onEndPage(
-     *      com.itextpdf.text.pdf.PdfWriter, com.itextpdf.text.Document)
-     */
-    public void onEndPage(PdfWriter writer, Document document) {
-        Rectangle header = writer.getBoxSize("header");
-        System.out.println(header.getLeft() +  " " + header.getRight() + " " +header.getBottom());
-        ColumnText.showTextAligned(writer.getDirectContent(),
-                Element.ALIGN_CENTER, new Phrase(String.format("page %d", pagenumber), new Font(Font.BOLD,9)),
-                (header.getLeft() + header.getRight()) / 2, header.getBottom() -30, 0);
-        
-        Rectangle footer = writer.getBoxSize("footer");
-       
-        ColumnText.showTextAligned(writer.getDirectContent(),
-                Element.ALIGN_CENTER, new Phrase(String.format("page %d", pagenumber), new Font(Font.BOLD,9)),
-                (footer.getLeft() + footer.getRight()) / 2, footer.getBottom() -30, 0);
-    }
-}
