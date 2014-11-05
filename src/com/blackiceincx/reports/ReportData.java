@@ -1,3 +1,4 @@
+package com.blackiceincx.reports;
 import java.util.List;
 
 import com.blackice.persistence.model.Assessment;

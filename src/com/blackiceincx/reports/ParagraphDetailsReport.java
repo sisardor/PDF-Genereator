@@ -1,6 +1,9 @@
+package com.blackiceincx.reports;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -14,9 +17,6 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 
-
-
-
 public class ParagraphDetailsReport {
 	private Document document;
 	private static String text = "\tLorem Ipsum is simply dummy text of the printing and typesetting\t industry.\nLorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
@@ -27,16 +27,36 @@ public class ParagraphDetailsReport {
 	static Font font9bold = new Font(Font.HELVETICA, 		9);
 	static Font font9 = new Font(Font.HELVETICA, 		9);
 	
+<<<<<<< HEAD:src/ParagraphDetailsReport.java
 	
 	int pdfHeight;
 	int pdfWidth;
 	private ParagraphDetailsData reportData;
 	
 	private String test = "Hello World";
+=======
+	static Font font10 = new Font(Font.TIMES_ROMAN, 	10);
+	static Font font10italic = new Font(Font.TIMES_ROMAN, 	10, Font.ITALIC);
+	static Font font10bold = new Font(Font.TIMES_ROMAN, 	10, Font.BOLD);
+	
+	static String headerLabel = "Bank Assessment Detail";
+	static String headerRegulation = "Regulation: %s";
+	static String headerAssDate = "Assessment Date: %s";
+	static String headerAssCriteria = "Assessment Criteria: %s";
+	
+	String XofYlabel = "Page %d of";
+	
+	String timestamp="Printed: " + new SimpleDateFormat("EEEE, MMM d, yyyy hh:mm: a").format(new Date());
+	
+	private ParagraphDetailsData reportData;
+
+>>>>>>> FETCH_HEAD:src/com/blackiceincx/reports/ParagraphDetailsReport.java
 	
 	public void generateReport(OutputStream os) throws DocumentException, IOException {
+ 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PdfWriter docWriter = null;
+<<<<<<< HEAD:src/ParagraphDetailsReport.java
 		HeaderFooterEvent event = new HeaderFooterEvent();
 		//EventHandler event = new EventHandler(this);
 		
@@ -50,22 +70,27 @@ public class ParagraphDetailsReport {
 		docWriter.setBoxSize("header", rect);
 		docWriter.setBoxSize("footer", new Rectangle(36, 54, pdfWidth,pdfHeight));
 		
+=======
+		HeaderFooterEventHandler event = new HeaderFooterEventHandler();
+
+		event.setHeaderLabel(new Phrase(headerLabel, font10bold));
+		event.setHeaderAssDate(new Phrase(String.format(headerAssDate,  reportData.getHeaderAssDate() ), font10) );
+		event.setHeaderAssCriteria(new Phrase(String.format(headerAssCriteria, reportData.getHeaderAssCriteria() ), font10) );
+		event.setHeaderRegulation(new Phrase(String.format(headerRegulation, reportData.getHeaderRegulation()), font10) );
+		event.setXofYlabel(XofYlabel);
+		event.setTimestamp(new Phrase(timestamp, font10italic));
+		event.setFont10italic(font10italic);
+		
+		docWriter = PdfWriter.getInstance(document, baos);
+>>>>>>> FETCH_HEAD:src/com/blackiceincx/reports/ParagraphDetailsReport.java
 		docWriter.setPageEvent(event);
-		//event.setHeader("Basel");
+
 		document.open();
 		
-	      System.out.println("page " +pdfHeight + " x " + pdfWidth);
 		// Add content
 	    for (int i = 0; i < 20; i++) {
-	    	
 			addDirParagraph(font9);
 			addAssessmentList(font8boldUnder);
-			if(i==10) {
-				test="Bank China America";
-			}
-			if(i==15) {
-				test="ACME";
-			}
 	    }
 	    
 	    
@@ -73,11 +98,15 @@ public class ParagraphDetailsReport {
 	    
 		document.close();
 		docWriter.close();
-      
+
         baos.writeTo(os);
         os.flush();
 	}
+<<<<<<< HEAD:src/ParagraphDetailsReport.java
 	public  void addDirParagraph(Font f1) throws DocumentException {
+=======
+	public void addDirParagraph(Font f1) throws DocumentException {
+>>>>>>> FETCH_HEAD:src/com/blackiceincx/reports/ParagraphDetailsReport.java
         PdfPTable table = new PdfPTable(2); // 3 columns.
         table.setSpacingAfter(3);
         PdfPCell parNumCell = new PdfPCell(new Paragraph("121", f1));
@@ -105,7 +134,11 @@ public class ParagraphDetailsReport {
 		document.add(table);
 		
 	}
+<<<<<<< HEAD:src/ParagraphDetailsReport.java
 	public  void addAssessmentList(Font f1) throws DocumentException {
+=======
+	public void addAssessmentList(Font f1) throws DocumentException {
+>>>>>>> FETCH_HEAD:src/com/blackiceincx/reports/ParagraphDetailsReport.java
 		PdfPTable table = new PdfPTable(8);
 		table.getDefaultCell().setPaddingTop(4);
 		table.getDefaultCell().setBorder(Rectangle.NO_BORDER); 
@@ -175,14 +208,6 @@ public class ParagraphDetailsReport {
 	public void setReportData(ParagraphDetailsData reportData) {
 		this.reportData = reportData;
 	}
-	public String getTest() {
-		return test;
-	}
-	public void setTest(String test) {
-		this.test ="Hello World";
-	}
-	
-	
 	
 }
 
